@@ -11,3 +11,9 @@ plot_spectrogram.py
 plot_vmatrices.py
 test.py
 utils.py
+bfi_angles.py
+dataset_maker.py
+main.py
+main_live_plot.py
+saved_angles.txt
+wi-bfi.yml
