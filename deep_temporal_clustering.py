@@ -1,3 +1,9 @@
+
+
+
+
+
+
 def get_label(idx, totlen):
     # 如果是26键入字母
     result = [0 for _ in range(totlen)]
