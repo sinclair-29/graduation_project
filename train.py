@@ -61,6 +61,7 @@ def eval(model, data_loader):
 
     with torch.no_grad():
         for idx, (data, label) in enumerate(data_loader):
+            data, label = data.to(device), label.to(device)
             output = model(data)
             loss = criterion(output, label)
             total_loss += loss
@@ -68,12 +69,12 @@ def eval(model, data_loader):
             num_correct += predicted_label.eq(label.data.view_as(predicted_label)).cpu().sum()
             current_batch_size = predicted_label[0]
             for i in range(current_batch_size):
-                predicted_labels.append(predicted_label[i][0],item())
+                predicted_labels.append(predicted_label[i][0].item())
                 true_labels.append(label[i].item())
 
-    accuracy = 100. * num_correct / len(data_loader)
+    accuracy = 100. * num_correct / len(data_loader.dataset)
     f1_macro = f1_score(true_labels, predicted_labels, average='macro')
-    logging.info(f'Accuracy on test dataset: {accuracy}')
+    logging.info(f'Accuracy on test dataset: {accuracy}%')
     logging.info(f'Macro-average F1 Score: {f1_macro}')
     eval_loss = loss / len(data_loader)
 
