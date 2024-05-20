@@ -17,3 +17,5 @@ main.py
 main_live_plot.py
 saved_angles.txt
 wi-bfi.yml
+.idea/
+vmatrices.py
