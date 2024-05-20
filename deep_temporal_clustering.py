@@ -1,55 +1,50 @@
-import torch
-import torch.nn as nn
-
-
-class SequenceAutoencoder(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers):
-        super(SequenceAutoencoder, self).__init__()
-
-        # 1D CNN layer
-        self.cnn = nn.Sequential(
-            nn.Conv1d(input_size, hidden_size, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool1d(kernel_size=2, stride=2)
-        )
-
-        # BiLSTM layer
-        self.bilstm = nn.LSTM(hidden_size, hidden_size, num_layers=num_layers, batch_first=True, bidirectional=True)
-
-        # Decoder
-        self.decoder = nn.Linear(hidden_size * 2, input_size)
-
-    def forward(self, x):
-        # x: input sequence (batch_size, seq_length, input_size)
-
-        # 1D CNN
-        x = x.permute(0, 2, 1)  # Reshape for Conv1d
-        x = self.cnn(x)
-
-        # BiLSTM
-        x = x.permute(0, 2, 1)  # Reshape for LSTM
-        _, (h, _) = self.bilstm(x)
-        hidden = torch.cat((h[-2], h[-1]), dim=1)  # Concatenate the hidden states of both directions
-
-        # Decoder
-        output = self.decoder(hidden)
-
-        return output
-
-# 创建模型实例
-input_size = n  # 输入大小为 n
-hidden_size = 64  # 隐藏层大小
-num_layers = 2  # BiLSTM 层数
-model = SequenceAutoencoder(input_size, hidden_size, num_layers)
-
-# 定义均方误差损失函数
-loss_fn = nn.MSELoss()
-
-# 将输入数据转换为张量
-input_data = torch.tensor(input_data)  # 输入数据的形状应为 (batch_size, seq_length, input_size)
-
-# 前向传播
-output_data = model(input_data)
-
-# 计算损失
-loss = loss_fn(output_data, input_data)
+def get_label(idx, totlen):
+    # 如果是26键入字母
+    result = [0 for _ in range(totlen)]
+    if idx in [1, 2, 7, 8]:
+        for i in range(26):
+            start_index = i * (totlen // 26)  # 起始索引
+            end_index = (i + 1) * (totlen // 26)  # 结束索引（不包含）
+            for k in range(start_index, end_index):
+                result[k] = i  # 赋值为字母的 ASCII 码
+            if i == 25:
+                for k in range(end_index, totlen):
+                    result[k] = i
+        #print(result)
+        return result
+    if idx == 3:
+        for i in range(26 * 5):
+            start_index = i * (totlen // 130)  # 起始索引
+            end_index = (i + 1) * (totlen // 130)  # 结束索引（不包含）
+            for k in range(start_index, end_index):
+                result[k] = i % 26
+            if i == 26 * 5:
+                for k in range(end_index, totlen):
+                    result[k] = 25
+        return result
+    if idx in [4, 5, 9]:
+        str = "privacyiscriticalforensuringthesecurityofcomputersystemsandtheprivacyofhumanusersaswhatbeingtypescouldbepasswordsorprivacysensitiveinformation"
+        strlen = len(str)
+        for i in range(strlen):
+            start_index = i * (totlen // strlen)  # 起始索引
+            end_index = (i + 1) * (totlen // strlen)  # 结束索引（不包含）
+            for k in range(start_index, end_index):
+                result[k] = ord(str[i]) - ord('a')
+            if i == strlen:
+                for k in range(end_index, totlen):
+                    result[k] = ord(str[i]) - ord('a')
+        return result
+    if idx == 6:
+        str = "privacyiscriticalforenuringthesecurityofcomputersystemsandtheprivacyofhumanusersaswhaybeingtypescouldbepasswordsorprivacysensitivesinformationtheresearchcommunityhassutdiedvariouswaystorecognizekeystrokeswhichcanbeclassifiedintothreecategoroesacousticemissionbasedapproacheselectromagneticemmisionbasedapproachesandvisionbasedapprachesacousticemmissionabasedapproachesrecognizekeystrokesbasedontethiertheobservationthattypingsoundsortheobservationthattheacousticemanationfromdifferentkeysarribeaydirrerenttimeasthekeysarelocatedatdifferentplacesinakeyboardelectromagneticemmissionbasedapproachesrecognizekeystrokesbasedontheobsrvationthattheelecyromagneticemanationsfromtheelectrivalvircuitunderneathdifferentkeysinakeyboardaredifferentvisionbasedapproachesrecognizekeystrokeusingvisiontechnologies"
+        strlen = len(str)
+        for i in range(strlen):
+            start_index = i * (totlen // strlen)  # 起始索引
+            end_index = (i + 1) * (totlen // strlen)  # 结束索引（不包含）
+            for k in range(start_index, end_index):
+                result[k] = ord(str[i]) - ord('a')
+            #print(ord(str[i]) - ord('a'))
+            if i == strlen:
+                for k in range(end_index, totlen):
+                    result[k] = ord(str[i]) - ord('a')
+        #print(result)
+        return result
