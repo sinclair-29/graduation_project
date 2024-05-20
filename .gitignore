@@ -5,3 +5,9 @@ Demo/
 output.txt
 LICENSE
 __pycache__/
+npyreader.py
+plot.py
+plot_spectrogram.py
+plot_vmatrices.py
+test.py
+utils.py
