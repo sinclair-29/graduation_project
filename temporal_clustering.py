@@ -9,21 +9,16 @@ from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 from sklearn.metrics.cluster import adjusted_rand_score
 
 
-class TemporalDataset(Dataset):
+class TemporalSequence:
 
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, idx):
         self.features = np.load(file_path)
         self.features = self.features.reshape(self.features.shape[0], 2340)
+        self.idx = idx
 
-    def __len__(self):
-        return len(self.features)
-
-    def __getitem__(self, idx):
-        feature = self.features[idx]
-        feature = torch.unsqueeze(feature, 0)  # 在第 0 维度添加一个维度
-        label = self.labels[idx]
-        return feature, label
+    def get_length(self):
+        return self.features.shape[0]
 
 
 def split_temporal_sequence(sequence, indices) -> list:
@@ -36,10 +31,23 @@ def split_temporal_sequence(sequence, indices) -> list:
     split_sequences = [sequence[:, split_indices[i]:split_indices[i + 1]] for i in range(len(split_indices) - 1) ]
     return split_sequences
 
+def brutally_split(totlen):
+    result = [0 for _ in range(totlen)]
+    for i in range(26):
+        start_index = i * (totlen // 26)  # 起始索引
+        end_index = (i + 1) * (totlen // 26)  # 结束索引（不包含）
+        for k in range(start_index, end_index):
+            result[k] = i  # 赋值为字母的 ASCII 码
+        if i == 25:
+            for k in range(end_index, totlen):
+                result[k] = i
+    return result
 
-def get_label(file_path):
-    temporal_dataset = TemporalDataset(file_path)
-
+alphabet_sequence_indices = [1, 2, 7, 8]
+def get_label(file_path, idx):
+    temporal_sequence = TemporalSequence(file_path, idx)
+    if idx in alphabet_sequence_indices:
+        return brutally_split(temporal_sequence.get_length())
     return None
 
 

@@ -149,14 +149,15 @@ def generate_static_dataset():
     return ConcatDataset(datasets)
 
 def generate_dynamic_dataset(datasets_indices:list):
-    paths = []
+    paths, digits = [], []
     for digit in datasets_indices:
-        path = 'bfa/bfa_' + digit + '.npy'
+        path = 'bfa/bfa_' + str(digit) + '.npy'
         paths.append(path)
+        digits.append(digit)
     datasets = []
-    for idx, path in enumerate(paths):
-        datasets.append(AngleDataset(path, idx, type='dynamic'))
-    return ConcatDataset()
+    for i in range(len(paths)):
+        datasets.append(AngleDataset(paths[i], digits[i], type='dynamic'))
+    return ConcatDataset(datasets)
 
 if __name__ == '__main__':
     opt = parse_arguments()
@@ -166,7 +167,7 @@ if __name__ == '__main__':
     if opt.set_dynamic is False:
         combined_dataset = generate_static_dataset()
     else:
-        combined_dataset = generate_dynamic_dataset(opt.datasets)
+        combined_dataset = generate_dynamic_dataset(opt.dataset)
     train_size = int(TRAIN_RATIO * len(combined_dataset))
     val_size = int(VAL_RATIO * len(combined_dataset))
     test_size = len(combined_dataset) - train_size - val_size
@@ -191,6 +192,8 @@ if __name__ == '__main__':
     logging.info(f'在测试集上的loss: {loss}')
 
 """
+
+
 excute terminal commands:
 python train.py --set_dynamic --dataset 1 2 7 8
 python train.py
