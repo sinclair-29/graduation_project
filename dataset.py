@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from torch.utils.data import Dataset
 
-from deep_temporal_clustering import get_label
+from temporal_clustering import get_label
 
 class AngleDataset(Dataset):
 
@@ -13,7 +13,7 @@ class AngleDataset(Dataset):
         if type == 'static':
             self.labels = torch.full((len(self.features), ), idx)
         elif type == 'dynamic':
-            self.labels = get_label(idx, len(self.features))
+            self.labels = get_label(file_path, idx)
 
     def __len__(self):
         return len(self.features)

@@ -128,12 +128,12 @@ def parse_arguments():
         help='Number of the categories. (default: 26)'
     )
     parser.add_argument(
-        '--is_static', type=bool, default = True,
+        '--set_dynamic', action='store_true',
         help='Specifies whether the datasets are statically (True) or dynamically (False) collected. (dafault: True)'
     )
     parser.add_argument(
-        '--dataset', action='append', type=int,
-        help='Specifies the datasets selected in the experiment. (action:append)'
+        '--dataset', nargs='+', type=int,
+        help='Specifies the datasets selected in the experiment.'
     )
     return parser.parse_args()
 
@@ -148,13 +148,25 @@ def generate_static_dataset():
         datasets.append(AngleDataset(path, idx, type='static'))
     return ConcatDataset(datasets)
 
+def generate_dynamic_dataset(datasets_indices:list):
+    paths = []
+    for digit in datasets_indices:
+        path = 'bfa/bfa_' + digit + '.npy'
+        paths.append(path)
+    datasets = []
+    for idx, path in enumerate(paths):
+        datasets.append(AngleDataset(path, idx, type='dynamic'))
+    return ConcatDataset()
+
 if __name__ == '__main__':
     opt = parse_arguments()
     TRAIN_RATIO, VAL_RATIO, TEST_RATIO = 0.6, 0.2, 0.2
-
     # Generate a dataset, randomly partition it into training, validation, and test sets
     # according to predefined proportions, for subsequent machine learning model training and evaluation.
-    combined_dataset = generate_static_dataset()
+    if opt.set_dynamic is False:
+        combined_dataset = generate_static_dataset()
+    else:
+        combined_dataset = generate_dynamic_dataset(opt.datasets)
     train_size = int(TRAIN_RATIO * len(combined_dataset))
     val_size = int(VAL_RATIO * len(combined_dataset))
     test_size = len(combined_dataset) - train_size - val_size
@@ -177,3 +189,9 @@ if __name__ == '__main__':
     loss = eval(model, test_dataloader)
     logging.info('Training Finished')
     logging.info(f'在测试集上的loss: {loss}')
+
+"""
+excute terminal commands:
+python train.py --set_dynamic --dataset 1 2 7 8
+python train.py
+"""
