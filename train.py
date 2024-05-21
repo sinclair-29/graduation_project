@@ -67,7 +67,7 @@ def eval(model, data_loader):
             total_loss += loss
             predicted_label = output.data.max(dim=1, keepdim=True)[1]
             num_correct += predicted_label.eq(label.data.view_as(predicted_label)).cpu().sum()
-            current_batch_size = predicted_label[0]
+            current_batch_size = data.size(0)
             for i in range(current_batch_size):
                 predicted_labels.append(predicted_label[i][0].item())
                 true_labels.append(label[i].item())
